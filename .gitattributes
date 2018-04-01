@@ -1,0 +1,4 @@
+* text=auto
+
+elm-package.json text eol=lf
+*.elm text eol=lf
