@@ -12,6 +12,8 @@ import WebGL as GL
 type alias Model =
     { width : Int
     , height : Int
+    , camPos : Vec3
+    , camYaw : Float
     }
 
 
@@ -85,15 +87,9 @@ projectionMatrix { width, height } =
     makePerspective 67.0 aspect near far
 
 
-viewMatrix : Mat4
-viewMatrix =
+viewMatrix : Model -> Mat4
+viewMatrix { camPos, camYaw } =
     let
-        camPos =
-            vec3 0 0 2
-
-        camYaw =
-            0.0
-
         translate =
             Math.Matrix4.translate (Math.Vector3.negate camPos) Math.Matrix4.identity
 
@@ -109,7 +105,7 @@ boxEntity model =
         vertexShader
         fragmentShader
         boxMesh
-        { uView = viewMatrix, uProjection = projectionMatrix model }
+        { uView = viewMatrix model, uProjection = projectionMatrix model }
 
 
 view : Model -> Html msg
@@ -120,10 +116,19 @@ view model =
         [ boxEntity model ]
 
 
+init : Model
+init =
+    { width = 640
+    , height = 480
+    , camPos = vec3 0 0 2
+    , camYaw = 0.0
+    }
+
+
 main : Program Never Model {}
 main =
     Html.beginnerProgram
-        { model = { width = 640, height = 480 }
+        { model = init
         , view = view
         , update = \_ m -> m
         }
