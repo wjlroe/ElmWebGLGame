@@ -5,10 +5,10 @@ import Char
 import Html exposing (..)
 import Html.Attributes exposing (height, width)
 import Keyboard
-import Math.Matrix4 exposing (..)
-import Math.Vector2 exposing (..)
+import Math.Matrix4 as Mat4
+import Math.Vector2 as Vec2
 import Math.Vector3 as Vec3
-import Math.Vector4 exposing (..)
+import Math.Vector4 as Vec4
 import Task
 import Time exposing (Time)
 import WebGL as GL
@@ -30,23 +30,23 @@ type Action
 
 
 type alias Vertex =
-    { position : Vec4, color : Vec3.Vec3 }
+    { position : Vec4.Vec4, color : Vec3.Vec3 }
 
 
 type alias Uniforms =
-    { uView : Mat4, uProjection : Mat4 }
+    { uView : Mat4.Mat4, uProjection : Mat4.Mat4 }
 
 
 boxMesh : GL.Mesh Vertex
 boxMesh =
     GL.triangles
-        [ ( Vertex (vec4 0.0 1.0 0.0 1.0) (Vec3.vec3 1.0 0.0 0.0)
-          , Vertex (vec4 0.5 0.0 0.0 1.0) (Vec3.vec3 0.0 1.0 0.0)
-          , Vertex (vec4 -0.5 0.0 0.0 1.0) (Vec3.vec3 0.0 0.0 1.0)
+        [ ( Vertex (Vec4.vec4 0.0 1.0 0.0 1.0) (Vec3.vec3 1.0 0.0 0.0)
+          , Vertex (Vec4.vec4 0.5 0.0 0.0 1.0) (Vec3.vec3 0.0 1.0 0.0)
+          , Vertex (Vec4.vec4 -0.5 0.0 0.0 1.0) (Vec3.vec3 0.0 0.0 1.0)
           )
-        , ( Vertex (vec4 -0.5 0.0 0.0 1.0) (Vec3.vec3 0.8 0.2 0.2)
-          , Vertex (vec4 0.5 0.0 0.0 1.0) (Vec3.vec3 0.2 0.8 0.2)
-          , Vertex (vec4 0.0 -1.0 0.0 1.0) (Vec3.vec3 0.2 0.2 0.8)
+        , ( Vertex (Vec4.vec4 -0.5 0.0 0.0 1.0) (Vec3.vec3 0.8 0.2 0.2)
+          , Vertex (Vec4.vec4 0.5 0.0 0.0 1.0) (Vec3.vec3 0.2 0.8 0.2)
+          , Vertex (Vec4.vec4 0.0 -1.0 0.0 1.0) (Vec3.vec3 0.2 0.2 0.8)
           )
         ]
 
@@ -84,7 +84,7 @@ void main () {
 |]
 
 
-projectionMatrix : Model -> Mat4
+projectionMatrix : Model -> Mat4.Mat4
 projectionMatrix { width, height } =
     let
         aspect =
@@ -96,19 +96,19 @@ projectionMatrix { width, height } =
         far =
             100.0
     in
-    makePerspective 67.0 aspect near far
+    Mat4.makePerspective 67.0 aspect near far
 
 
-viewMatrix : Model -> Mat4
+viewMatrix : Model -> Mat4.Mat4
 viewMatrix { camPos, camYaw } =
     let
         translate =
-            Math.Matrix4.translate (Vec3.negate camPos) Math.Matrix4.identity
+            Mat4.translate (Vec3.negate camPos) Mat4.identity
 
         rotate =
-            makeRotate -camYaw (Vec3.vec3 0 1 0)
+            Mat4.makeRotate -camYaw (Vec3.vec3 0 1 0)
     in
-    mul rotate translate
+    Mat4.mul rotate translate
 
 
 boxEntity : Model -> GL.Entity
