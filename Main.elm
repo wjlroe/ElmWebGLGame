@@ -9,6 +9,12 @@ import Math.Vector4 exposing (..)
 import WebGL as GL
 
 
+type alias Model =
+    { width : Int
+    , height : Int
+    }
+
+
 type alias Vertex =
     { position : Vec4, color : Vec3 }
 
@@ -64,11 +70,11 @@ void main () {
 |]
 
 
-projectionMatrix : Mat4
-projectionMatrix =
+projectionMatrix : Model -> Mat4
+projectionMatrix { width, height } =
     let
         aspect =
-            640.0 / 480.0
+            toFloat width / toFloat height
 
         near =
             0.1
@@ -97,27 +103,27 @@ viewMatrix =
     mul rotate translate
 
 
-boxEntity : GL.Entity
-boxEntity =
+boxEntity : Model -> GL.Entity
+boxEntity model =
     GL.entity
         vertexShader
         fragmentShader
         boxMesh
-        { uView = viewMatrix, uProjection = projectionMatrix }
+        { uView = viewMatrix, uProjection = projectionMatrix model }
 
 
-view : {} -> Html msg
-view _ =
+view : Model -> Html msg
+view model =
     GL.toHtmlWith
         [ GL.alpha True, GL.antialias, GL.depth 1, GL.clearColor 0.6 0.6 0.8 1.0 ]
-        [ width 640, height 480 ]
-        [ boxEntity ]
+        [ width model.width, height model.height ]
+        [ boxEntity model ]
 
 
-main : Program Never {} {}
+main : Program Never Model {}
 main =
     Html.beginnerProgram
-        { model = {}
+        { model = { width = 640, height = 480 }
         , view = view
-        , update = \_ _ -> {}
+        , update = \_ m -> m
         }
